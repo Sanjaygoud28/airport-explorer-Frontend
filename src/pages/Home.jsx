@@ -12,8 +12,8 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { PageContainer } from '../components/layout/PageContainer';
-import { MOCK_POPULAR_CHIPS } from '../data/mockData';
 import { useAdminStats } from '../hooks/useAirportsQuery';
+import { useAirports } from '../hooks/useAirportsQuery';
 
 export function Home() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +21,10 @@ export function Home() {
 
   // Fetch metrics dynamically with TanStack Query
   const { data: stats } = useAdminStats();
+  const { data: popularData } = useAirports({
+    limit: 8,
+  });
+  const popularChips = popularData?.data || [];
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -29,6 +33,7 @@ export function Home() {
     } else {
       navigate('/airports');
     }
+
   };
 
   const handleChipClick = (code) => {
@@ -36,6 +41,7 @@ export function Home() {
   };
 
   return (
+
     <div className="flex flex-col min-h-screen">
       {/* Aviation Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/70 via-background to-background dark:from-slate-900/50 py-16 md:py-24 border-b">
@@ -51,10 +57,10 @@ export function Home() {
 
           {/* Hero Heading */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-tight sm:leading-none">
-                      Look up any airport,
-           <br className="hidden sm:inline" />
+            Look up any airport,
+            <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-sky-600 via-indigo-600 to-sky-500 bg-clip-text text-transparent">
-          by code or by name.
+              by code or by name.
             </span>
           </h1>
 
@@ -94,13 +100,13 @@ export function Home() {
               <span className="font-medium text-slate-600 dark:text-slate-400">
                 Popular Hubs:
               </span>
-              {MOCK_POPULAR_CHIPS.map((code) => (
+              {popularChips.map((airport) => (
                 <button
-                  key={code}
-                  onClick={() => handleChipClick(code)}
+                  key={airport._id}
+                  onClick={() => handleChipClick(airport.iataCode)}
                   className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-100 text-slate-700 hover:text-sky-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 text-xs font-mono font-bold transition-colors cursor-pointer"
                 >
-                  {code}
+                  {airport.iataCode}
                 </button>
               ))}
             </div>

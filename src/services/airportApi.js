@@ -12,48 +12,48 @@ export const airportApi = {
    */
   getAirports: async (params = {}) => {
     // TODO: Connect to existing backend API: GET /airports
-    // const response = await api.get('/airports', { params });
-    // return response.data;
-    
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let filtered = [...MOCK_AIRPORTS];
+    const response = await api.get('/airports/');
+    return response.data;
 
-        if (params.search) {
-          const q = params.search.toLowerCase();
-          filtered = filtered.filter(
-            (a) =>
-              a.iataCode.toLowerCase().includes(q) ||
-              a.name.toLowerCase().includes(q) ||
-              a.city.toLowerCase().includes(q) ||
-              a.country.toLowerCase().includes(q)
-          );
-        }
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     let filtered = [...MOCK_AIRPORTS];
 
-        if (params.country && params.country !== 'all') {
-          filtered = filtered.filter((a) => a.country.toLowerCase() === params.country.toLowerCase());
-        }
+    //     if (params.search) {
+    //       const q = params.search.toLowerCase();
+    //       filtered = filtered.filter(
+    //         (a) =>
+    //           a.iataCode.toLowerCase().includes(q) ||
+    //           a.name.toLowerCase().includes(q) ||
+    //           a.city.toLowerCase().includes(q) ||
+    //           a.country.toLowerCase().includes(q)
+    //       );
+    //     }
 
-        if (params.type && params.type !== 'all') {
-          filtered = filtered.filter((a) => a.type === params.type);
-        }
+    //     if (params.country && params.country !== 'all') {
+    //       filtered = filtered.filter((a) => a.country.toLowerCase() === params.country.toLowerCase());
+    //     }
 
-        const page = parseInt(params.page, 10) || 1;
-        const limit = parseInt(params.limit, 10) || 6;
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
+    //     if (params.type && params.type !== 'all') {
+    //       filtered = filtered.filter((a) => a.type === params.type);
+    //     }
 
-        resolve({
-          airports: filtered.slice(startIndex, endIndex),
-          pagination: {
-            total: filtered.length,
-            page,
-            limit,
-            totalPages: Math.ceil(filtered.length / limit) || 1,
-          },
-        });
-      }, 400);
-    });
+    //     const page = parseInt(params.page, 10) || 1;
+    //     const limit = parseInt(params.limit, 10) || 6;
+    //     const startIndex = (page - 1) * limit;
+    //     const endIndex = startIndex + limit;
+
+    //     resolve({
+    //       airports: filtered.slice(startIndex, endIndex),
+    //       pagination: {
+    //         total: filtered.length,
+    //         page,
+    //         limit,
+    //         totalPages: Math.ceil(filtered.length / limit) || 1,
+    //       },
+    //     });
+    //   }, 400);
+    // });
   },
 
   /**
@@ -61,47 +61,50 @@ export const airportApi = {
    */
   getAirportByIata: async (iataCode) => {
     // TODO: Connect to existing backend API: GET /airports/:iataCode
-    // const response = await api.get(`/airports/${iataCode}`);
-    // return response.data;
+    const response = await api.get(`/airports/${iataCode}`);
+    console.log("API RESPONSE:", response.data);
 
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const found = MOCK_AIRPORTS.find(
-          (a) => a.iataCode.toUpperCase() === (iataCode || '').toUpperCase()
-        );
-        if (found) {
-          resolve(found);
-        } else {
-          reject(new Error(`Airport with IATA code "${iataCode}" was not found.`));
-        }
-      }, 300);
-    });
+    return response.data
+
+    // return new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     const found = MOCK_AIRPORTS.find(
+    //       (a) => a.iataCode.toUpperCase() === (iataCode || '').toUpperCase()
+    //     );
+    //     if (found) {
+    //       resolve(found);
+    //     } else {
+    //       reject(new Error(`Airport with IATA code "${iataCode}" was not found.`));
+    //     }
+    //   }, 300);
+    // });
   },
 
   /**
    * Search airports dynamically by keyword (IATA or Airport Name).
    */
+
   searchAirports: async (query) => {
     // TODO: Connect to existing backend API: GET /airports/search?q=...
-    // const response = await api.get('/airports/search', { params: { q: query } });
-    // return response.data;
+    const response = await api.get('/airports/search', { params: { name: query } });
+    return response.data;
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (!query || !query.trim()) {
-          resolve([]);
-          return;
-        }
-        const q = query.toLowerCase().trim();
-        const results = MOCK_AIRPORTS.filter(
-          (a) =>
-            a.iataCode.toLowerCase().includes(q) ||
-            a.name.toLowerCase().includes(q) ||
-            a.city.toLowerCase().includes(q)
-        );
-        resolve(results);
-      }, 250);
-    });
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     if (!query || !query.trim()) {
+    //       resolve([]);
+    //       return;
+    //     }
+    //     const q = query.toLowerCase().trim();
+    //     const results = MOCK_AIRPORTS.filter(
+    //       (a) =>
+    //         a.iataCode.toLowerCase().includes(q) ||
+    //         a.name.toLowerCase().includes(q) ||
+    //         a.city.toLowerCase().includes(q)
+    //     );
+    //     resolve(results);
+    //   }, 250);
+    // });
   },
 
   /**
@@ -121,16 +124,16 @@ export const airportApi = {
    */
   createAirport: async (airportData) => {
     // TODO: Connect to existing backend API: POST /airports
-    // const response = await api.post('/airports', airportData);
-    // return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          ...airportData,
-          id: String(Date.now()),
-        });
-      }, 400);
-    });
+    const response = await api.post('/airports/', airportData);
+    return response.data;
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve({
+    //       ...airportData,
+    //       id: String(Date.now()),
+    //     });
+    //   }, 400);
+    // });
   },
 
   /**
@@ -138,13 +141,13 @@ export const airportApi = {
    */
   updateAirport: async (id, airportData) => {
     // TODO: Connect to existing backend API: PUT /airports/:id
-    // const response = await api.put(`/airports/${id}`, airportData);
-    // return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ ...airportData, id });
-      }, 400);
-    });
+    const response = await api.put(`/airports/${id}`, airportData);
+    return response.data;
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve({ ...airportData, id });
+    //   }, 400);
+    // });
   },
 
   /**
@@ -152,14 +155,25 @@ export const airportApi = {
    */
   deleteAirport: async (id) => {
     // TODO: Connect to existing backend API: DELETE /airports/:id
-    // const response = await api.delete(`/airports/${id}`);
-    // return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ message: 'Airport removed successfully', id });
-      }, 400);
-    });
+
+
+    const response = await api.delete(`/airports/${id}`);
+    return response.data;
+
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve({ message: 'Airport removed successfully', id });
+    //   }, 400);
+    // });
   },
+
+
+
+
+  createAdmin: async (adminData, token) => {
+    const response = await api.post('/users/create-admin', adminData);
+    return response.data;
+  }
 };
 
 export default airportApi;

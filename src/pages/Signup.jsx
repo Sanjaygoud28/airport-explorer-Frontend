@@ -16,6 +16,7 @@ export function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mobile, setMobile] = useState("");
 
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export function Signup() {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !mobile || !confirmPassword) {
       setErrorMessage('Please fill in all required fields.');
       return;
     }
@@ -39,9 +40,10 @@ export function Signup() {
       return;
     }
 
+
     try {
       setIsSubmitting(true);
-      await signup({ name, email, password });
+      await signup({ name, email, password,mobile });
       navigate('/profile', { replace: true });
     } catch (err) {
       setErrorMessage(err.message || 'Registration failed. Please try again.');
@@ -113,6 +115,25 @@ export function Signup() {
                     placeholder="sanjay@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="pl-9"
+                    required
+                  />
+                </div>
+              </div>
+
+
+              {/*  mobile number */}
+              <div className="space-y-1.5">
+                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Enter Mobile Number
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="text"
+                    placeholder="Enter your 10-digit mobile number"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
                     className="pl-9"
                     required
                   />

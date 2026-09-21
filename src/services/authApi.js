@@ -13,19 +13,8 @@ export const authApi = {
   login: async (credentials) => {
     // TODO: Connect to existing backend API: POST /auth/login
     // return (await api.post('/auth/login', credentials)).data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: 'u_101',
-            name: credentials.email.split('@')[0] || 'Aviation Enthusiast',
-            email: credentials.email,
-            role: credentials.email.includes('admin') ? 'admin' : 'user',
-          },
-          message: 'Login successful',
-        });
-      }, 500);
-    });
+    const response = await api.post("/users/login", credentials);
+    return response.data;
   },
 
   /**
@@ -34,20 +23,11 @@ export const authApi = {
   signup: async (userData) => {
     // TODO: Connect to existing backend API: POST /auth/signup
     // return (await api.post('/auth/signup', userData)).data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: 'u_' + Date.now(),
-            name: userData.name,
-            email: userData.email,
-            role: 'user',
-          },
-          message: 'Registration successful',
-        });
-      }, 500);
-    });
+    const response = await api.post("/users/signup", userData);
+    return response.data;
   },
+
+
 
   /**
    * Get current authenticated user profile using active session cookie.
@@ -64,12 +44,26 @@ export const authApi = {
   logout: async () => {
     // TODO: Connect to existing backend API: POST /auth/logout
     // return (await api.post('/auth/logout')).data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ message: 'Logged out successfully' });
-      }, 200);
-    });
+
+    const response = await api.post("/users/logout");
+    return response.data;
   },
+
+
+  refresh: async () => {
+    const response = await api.post("/users/refresh");
+    console.log(response.data)
+    return response.data;
+  },
+
+  createAdmin: async (adminData) => {
+    const response = await api.post('/users/create-admin', adminData);
+    console.log(response.data)
+
+
+
+    return response.data;
+  }
 };
 
 export default authApi;

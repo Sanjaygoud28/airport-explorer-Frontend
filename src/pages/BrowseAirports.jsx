@@ -11,10 +11,13 @@ import { AirportCard } from '../components/airport/AirportCard';
 import { FilterPanel } from '../components/airport/FilterPanel';
 import { Pagination } from '../components/airport/Pagination';
 import { AirportMap } from '../components/airport/AirportMap';
+import { useSearchAirports } from '../hooks/useAirportsQuery';
 
 export function BrowseAirports() {
+
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
+  // BrowseAirports reads the search from the URL
 
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCountry, setSelectedCountry] = useState('all');
@@ -24,25 +27,57 @@ export function BrowseAirports() {
 
   // Debounce search query to optimize API request frequency
   const debouncedSearch = useDebounce(searchQuery, 350);
-
+  const isSearching = debouncedSearch.trim().length > 0;
   // TanStack Query: handles caching, loading states, error states, and pagination
   const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useAirports({
-    search: debouncedSearch,
-    country: selectedCountry,
-    type: selectedType,
-    page: currentPage,
+    data: airportsData,
+    isLoading: isListLoading,
+    isError: isListError,
+    error: listError,
+    refetch: refetchList,
+  } = useAirports(
+    {
+      country: selectedCountry,
+      type: selectedType,
+      page: currentPage,
+      limit: 6,
+    },
+    !isSearching
+  );
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+    error: searchError,
+  } = useSearchAirports(debouncedSearch);
+
+  const activeData = isSearching ? searchData : airportsData;
+
+  // Choose loading state
+  const isLoading = isSearching
+    ? isSearchLoading
+    : isListLoading;
+
+
+  // Choose error state
+  const isError = isSearching
+    ? isSearchError
+    : isListError;
+
+
+  // Choose error object
+  const error = isSearching
+    ? searchError
+    : listError;
+
+  const airports = activeData?.data || [];
+
+  const pagination = {
+    total: activeData?.total || 0,
+    page: activeData?.page || 1,
     limit: 6,
-  });
-
-  const airports = data?.airports || [];
-  const pagination = data?.pagination || { total: 0, page: 1, limit: 6, totalPages: 1 };
-
+    totalPages: activeData?.totalPages || 1,
+  };
   const handleClearFilters = () => {
     setSearchQuery('');
     setSelectedCountry('all');
@@ -144,7 +179,7 @@ export function BrowseAirports() {
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {airports.map((airport) => (
-                <AirportCard key={airport.id || airport.iataCode} airport={airport} />
+                <AirportCard key={airport._id || airport.iataCode} airport={airport} />
               ))}
             </div>
           ) : (
@@ -152,12 +187,13 @@ export function BrowseAirports() {
               <AirportMap airports={airports} height="500px" />
             </div>
           )}
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={pagination.totalPages}
-            onPageChange={setCurrentPage}
-          />
+          {!isSearching && (
+            <Pagination
+              currentPage={airportsData?.page || currentPage}
+              totalPages={airportsData?.totalPages || 1}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </>
       )}
     </PageContainer>

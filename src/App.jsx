@@ -7,21 +7,34 @@ import { AdminRoute } from './routes/AdminRoute';
 
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
-
+// import { useAuth } from "./stores/authStore";
+import { useAuthStore } from "./stores/authStore";
+import { useEffect } from 'react';
 // Pages
 import { Home } from './pages/Home';
 import { BrowseAirports } from './pages/BrowseAirports';
 import { AirportDetails } from './pages/AirportDetails';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { Logout } from './pages/Logout';
 import { Profile } from './pages/Profile';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFound } from './pages/NotFound';
+// import CreateAdminModal from './pages/CreateAdminModal';
 
 export function App() {
+  const initializeAuth = useAuthStore(
+    (state) => state.initializeAuth
+  );
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+
   return (
     <QueryClientProvider client={queryClient}>  //providesreact query functionality
-      
+
       <Router>
         <div className="min-h-screen flex flex-col bg-background text-foreground">
           {/* Dynamic RBAC Navbar (Guest, User, Admin) powered by Zustand */}
@@ -36,26 +49,27 @@ export function App() {
               <Route path="/airports/:iataCode" element={<AirportDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-
+              <Route path="/logout" element={<Logout />} />
+              {/* <Route path="/create-admin" element={<CreateAdminModal />} /> */}
               {/* Authenticated Explorer Route (RBAC Protected) */}
-              {/* <Route
+              <Route
                 path="/profile"
                 element={
                   <ProtectedRoute>
                     <Profile />
                   </ProtectedRoute>
                 }
-              /> */}
+              />
 
               {/* Administrator Route (RBAC Protected) */}
-              {/* <Route
+              <Route
                 path="/admin"
                 element={
                   <AdminRoute>
                     <AdminDashboard />
                   </AdminRoute>
                 }
-              /> */}
+              />
 
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />

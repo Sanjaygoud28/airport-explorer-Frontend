@@ -11,6 +11,7 @@ import {
   Search,
   CheckCircle,
 } from 'lucide-react';
+
 import { PageContainer } from '../components/layout/PageContainer';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -19,6 +20,7 @@ import { Badge } from '../components/ui/badge';
 import { Loading } from '../components/common/Loading';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import { useAdminStats, useAirports, useDeleteAirport } from '../hooks/useAirportsQuery';
+import { AirportFormModal } from '../components/admin/AirportFormModal';
 
 export function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +28,11 @@ export function AdminDashboard() {
   // Dialog state for delete confirmation
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedAirportToDelete, setSelectedAirportToDelete] = useState(null);
+  
+  // Dialog state for add/edit form
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [airportToEdit, setAirportToEdit] = useState(null);
+
   const [notification, setNotification] = useState('');
 
   // TanStack Query: fetch stats & airport list
@@ -40,18 +47,18 @@ export function AdminDashboard() {
     isError,
     error,
     refetch,
-  } = useAirports({ limit: 50 });
+  } = useAirports();
 
   // TanStack Query mutation for deleting airport with automatic cache invalidation
   const deleteMutation = useDeleteAirport();
 
-  const airports = airportsData?.airports || [];
+  const airports = airportsData?.data || [];
   const loading = isStatsLoading || isAirportsLoading;
 
   const handleDeleteConfirm = async () => {
     if (!selectedAirportToDelete) return;
     try {
-      await deleteMutation.mutateAsync(selectedAirportToDelete.id);
+      await deleteMutation.mutateAsync(selectedAirportToDelete._id);
       setNotification(`Airport "${selectedAirportToDelete.name}" deleted successfully.`);
       setTimeout(() => setNotification(''), 4000);
     } catch (err) {
@@ -66,7 +73,7 @@ export function AdminDashboard() {
     (a) =>
       a.iataCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.city.toLowerCase().includes(searchQuery.toLowerCase())
+    a.city?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -87,11 +94,10 @@ export function AdminDashboard() {
         </div>
 
         <Button
-          onClick={() =>
-            alert(
-              'Add Airport Form will be fully integrated in Phase 5 with complete schema validation!'
-            )
-          }
+          onClick={() => {
+            setAirportToEdit(null);
+            setFormModalOpen(true);
+          }}
           className="gap-2 bg-sky-600 hover:bg-sky-700 shadow-sm cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
@@ -108,7 +114,7 @@ export function AdminDashboard() {
       )}
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
         <Card className="border-slate-200 dark:border-slate-800">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center shrink-0">
@@ -204,7 +210,7 @@ export function AdminDashboard() {
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {filteredAirports.map((airport) => (
                       <tr
-                        key={airport.id || airport.iataCode}
+                        key={airport._id || airport.iataCode}
                         className="hover:bg-slate-50/70 dark:hover:bg-slate-900/30 transition-colors"
                       >
                         <td className="py-3.5 px-4 font-medium text-slate-900 dark:text-slate-100">
@@ -214,11 +220,10 @@ export function AdminDashboard() {
                           {airport.iataCode}
                         </td>
                         <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
-                          {airport.city}
+                          {airport.city?.name}
                         </td>
                         <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
-                          {airport.country}
-                        </td>
+{airport.city?.country?.name}                        </td>
                         <td className="py-3.5 px-4">
                           <Badge variant="outline" className="text-[10px] capitalize font-normal">
                             {airport.type?.replace('_', ' ')}
@@ -228,11 +233,10 @@ export function AdminDashboard() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() =>
-                              alert(
-                                `Editing ${airport.name} (${airport.iataCode}) will be fully available in Phase 5!`
-                              )
-                            }
+                            onClick={() => {
+                              setAirportToEdit(airport);
+                              setFormModalOpen(true);
+                            }}
                             className="h-8 px-2 text-slate-600 hover:text-sky-600 cursor-pointer"
                           >
                             <Edit2 className="h-3.5 w-3.5 mr-1" />
@@ -261,7 +265,7 @@ export function AdminDashboard() {
               {/* Mobile Responsive Cards View */}
               <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredAirports.map((airport) => (
-                  <div key={airport.id || airport.iataCode} className="p-4 space-y-2">
+                  <div key={airport._id || airport.iataCode} className="p-4 space-y-2">
                     <div className="flex items-start justify-between">
                       <span className="font-mono text-lg font-bold text-sky-600">
                         {airport.iataCode}
@@ -272,15 +276,16 @@ export function AdminDashboard() {
                     </div>
                     <p className="font-semibold text-sm">{airport.name}</p>
                     <p className="text-xs text-slate-500">
-                      {airport.city}, {airport.country}
+                      {airport.city?.name}, {airport.city?.country?.name}
                     </p>
                     <div className="flex justify-end gap-2 pt-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          alert(`Edit modal for ${airport.name} ready in Phase 5`)
-                        }
+                        onClick={() => {
+                          setAirportToEdit(airport);
+                          setFormModalOpen(true);
+                        }}
                         className="h-8 text-xs cursor-pointer"
                       >
                         <Edit2 className="h-3 w-3 mr-1" /> Edit
@@ -351,6 +356,17 @@ export function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Add/Edit Form Modal */}
+      <AirportFormModal
+        isOpen={formModalOpen}
+        onClose={() => setFormModalOpen(false)}
+        airport={airportToEdit}
+        onSuccess={(msg) => {
+          setNotification(msg);
+          setTimeout(() => setNotification(''), 4000);
+        }}
+      />
     </PageContainer>
   );
 }

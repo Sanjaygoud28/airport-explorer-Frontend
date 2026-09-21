@@ -20,6 +20,7 @@ import { Badge } from '../components/ui/badge';
 
 export function Profile() {
   const { user, role, logout } = useAuth();
+  console.log("PROFILE USER:", user);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -70,6 +71,16 @@ export function Profile() {
               </span>
               <span className="font-semibold text-slate-900 dark:text-white capitalize">
                 {role}
+              </span>
+            </div>
+
+             <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-slate-500">
+                <Calendar className="h-3.5 w-3.5" />
+                Mobile Number
+              </span>
+              <span className="font-semibold text-slate-900 dark:text-white">
+                {user?.mobile}
               </span>
             </div>
             <div className="flex items-center justify-between">

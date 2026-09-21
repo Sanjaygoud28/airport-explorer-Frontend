@@ -15,11 +15,12 @@ export function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, setMockRole } = useAuth();
+  const { login, } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/';
+  // const location = useLocation();
+
+  // const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ export function Login() {
     try {
       setIsSubmitting(true);
       await login({ email, password });
-      navigate(from, { replace: true });
+      navigate("/profile");
     } catch (err) {
       setErrorMessage(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -41,17 +42,18 @@ export function Login() {
     }
   };
 
-  const handleQuickFill = (roleType) => {
-    if (roleType === 'admin') {
-      setEmail('admin@airportexplorer.io');
-      setPassword('adminPass123!');
-    } else {
-      setEmail('explorer@airportexplorer.io');
-      setPassword('userPass123!');
-    }
-  };
+  // const handleQuickFill = (roleType) => {
+  //   if (roleType === 'admin') {
+  //     setEmail('admin@airportexplorer.io');
+  //     setPassword('adminPass123!');
+  //   } else {
+  //     setEmail('explorer@airportexplorer.io');
+  //     setPassword('userPass123!');
+  //   }
+  // };
 
   return (
+
     <PageContainer className="flex items-center justify-center min-h-[75vh]">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
@@ -134,7 +136,7 @@ export function Login() {
               </div>
 
               {/* Quick Fill Test Credentials Helper */}
-              <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border text-xs space-y-1.5">
+              {/* <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border text-xs space-y-1.5">
                 <span className="font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-sky-500" />
                   Quick Fill Test Credentials:
@@ -155,10 +157,12 @@ export function Login() {
                     Admin Login
                   </button>
                 </div>
-              </div>
+              </div> */}
+
             </CardContent>
 
             <CardFooter className="flex flex-col space-y-4 pt-2">
+
               <Button
                 type="submit"
                 className="w-full h-11 gap-2 cursor-pointer font-semibold shadow-sm"
@@ -168,7 +172,7 @@ export function Login() {
                 {isSubmitting ? 'Authenticating...' : 'Login to Account'}
               </Button>
 
-              <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-center text-xs text-slate-500 dark:text-slate-400">
                 Don't have an account?{' '}
                 <Link
                   to="/signup"
@@ -182,6 +186,7 @@ export function Login() {
         </Card>
       </div>
     </PageContainer>
+    
   );
 }
 

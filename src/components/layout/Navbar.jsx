@@ -33,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import CreateAdminModal from '../../pages/CreateAdminModal';
 
 /**
  * Navbar Component with Dynamic Role-Based Access Control (RBAC) UI:
@@ -46,9 +47,11 @@ import {
  * 3. ADMIN:
  *    [ ✈ Airport Explorer ]   Home  Browse  Dashboard       👤 Admin ▼   [Logout]
  */
+
 export function Navbar() {
-  const { user, role, isAuthenticated, logout, setMockRole } = useAuth();
+  const { user, role, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCreateAdminOpen, setIsCreateAdminOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -58,24 +61,23 @@ export function Navbar() {
 
   // Standard navlink styling with active indicator
   const navLinkClass = ({ isActive }) =>
-    `inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
-      isActive
-        ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 font-semibold shadow-2xs'
-        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+    `inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${isActive
+      ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 font-semibold shadow-2xs'
+      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
     }`;
 
   // Mobile drawer navlink styling
   const mobileNavLinkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors ${
-      isActive
-        ? 'bg-sky-50 text-sky-600 font-semibold dark:bg-sky-950/60 dark:text-sky-400'
-        : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+    `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive
+      ? 'bg-sky-50 text-sky-600 font-semibold dark:bg-sky-950/60 dark:text-sky-400'
+      : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
     }`;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-xs">
+
       {/* Dev / Learning Mode Switcher Bar */}
-      <div className="bg-slate-950 text-slate-300 text-xs px-4 py-1.5 flex items-center justify-between border-b border-slate-800/80">
+      {/* {/* <div className="bg-slate-950 text-slate-300 text-xs px-4 py-1.5 flex items-center justify-between border-b border-slate-800/80">
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-mono text-[11px] text-slate-400 hidden sm:inline">
@@ -87,10 +89,10 @@ export function Navbar() {
           >
             {role}
           </Badge>
-        </div>
+        </div> */}
 
-        {/* Quick Role Switcher for Development & Learning */}
-        <div className="flex items-center gap-1.5">
+      {/* Quick Role Switcher for Development & Learning */}
+      {/* <div className="flex items-center gap-1.5">
           <span className="text-[11px] text-slate-400 mr-1 hidden sm:inline">
             Test Role:
           </span>
@@ -125,7 +127,7 @@ export function Navbar() {
             Admin
           </button>
         </div>
-      </div>
+      </div> */} */
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -163,10 +165,17 @@ export function Navbar() {
 
             {/* 3. Dashboard - ADMIN ONLY */}
             {role === 'admin' && (
-              <NavLink to="/admin" className={navLinkClass}>
-                <LayoutDashboard className="h-4 w-4 text-amber-500" />
-                <span>Dashboard</span>
-              </NavLink>
+              <>
+                <NavLink to="/admin" className={navLinkClass}>
+                  <LayoutDashboard className="h-4 w-4 text-amber-500" />
+                  <span>Dashboard</span>
+                </NavLink>
+                <Button onClick={() => setIsCreateAdminOpen(true)}>
+                  Create Admin
+                </Button>
+
+
+              </>
             )}
           </nav>
         </div>
@@ -426,8 +435,13 @@ export function Navbar() {
                 )}
               </div>
             </SheetContent>
+
           </Sheet>
         </div>
+        <CreateAdminModal
+          isOpen={isCreateAdminOpen}
+          onClose={() => setIsCreateAdminOpen(false)}
+        />
       </div>
     </header>
   );

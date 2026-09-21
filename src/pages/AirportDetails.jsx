@@ -33,16 +33,20 @@ export function AirportDetails() {
 
 
   const { iataCode } = useParams();
+  // const { iataCode } = useParams();
 
+  console.log("AirportDetails rendered");
+  console.log("iataCode:", iataCode);
   // TanStack Query hook for single airport retrieval & caching
   const {
-    data: airport,
+    data: airports,
     isLoading,
     isError,
     error,
     refetch,
   } = useAirportDetails(iataCode);
 
+  const airport = airports?.data
 
   if (isLoading) {
     return (
@@ -56,7 +60,7 @@ export function AirportDetails() {
     return (
       <PageContainer>
         <div className="space-y-4 max-w-xl mx-auto py-8">
-          <Link to="/airports">
+          <Link to="/">
             <Button variant="ghost" size="sm" className="gap-2 cursor-pointer">
               <ArrowLeft className="h-4 w-4" /> Back to Directory
             </Button>
@@ -72,21 +76,21 @@ export function AirportDetails() {
   }
 
   const hasCoords =
-    typeof airport.latitude === 'number' && typeof airport.longitude === 'number';
+    typeof airport.latitudeDeg === 'number' &&
+    typeof airport.longitudeDeg === 'number';
 
   return (
     <PageContainer className="space-y-8">
       {/* Top Back Navigation */}
       <div className="flex items-center justify-between">
-        <Link to="/airports">
+        <Link to="/">
           <Button variant="outline" size="sm" className="gap-2 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
             Back to Airports
           </Button>
         </Link>
         <Badge variant="outline" className="font-mono text-xs">
-          Coordinates: {airport.latitude?.toFixed(4)}, {airport.longitude?.toFixed(4)}
-        </Badge>
+          Coordinates: {airport.latitudeDeg?.toFixed(4)}, {airport.longitudeDeg?.toFixed(4)}        </Badge>
       </div>
 
       {/* Hero Title Card */}
@@ -109,7 +113,9 @@ export function AirportDetails() {
           </h1>
           <p className="text-sm text-slate-300 flex items-center gap-2">
             <MapPin className="h-4 w-4 text-sky-400" />
-            {airport.city}, {airport.country} ({airport.countryCode})
+            {airport.city?.name}, {airport.city?.country?.name} (
+            {airport.city?.country?.countryCodeTwo}
+            )
           </p>
         </div>
 
@@ -117,15 +123,9 @@ export function AirportDetails() {
           <div>
             <p className="text-xs text-slate-400 font-medium">Elevation</p>
             <p className="text-xl font-bold font-mono text-white">
-              {airport.elevation?.toLocaleString()} ft
-            </p>
+              {airport.elevationFt?.toLocaleString()} ft            </p>
           </div>
-          <div>
-            <p className="text-xs text-slate-400 font-medium">Timezone</p>
-            <p className="text-sm font-mono text-sky-300">
-              {airport.timezone || 'UTC'}
-            </p>
-          </div>
+
         </div>
       </div>
 
@@ -143,7 +143,6 @@ export function AirportDetails() {
           <CardContent className="text-xs space-y-1 text-slate-600 dark:text-slate-400">
             <p><strong>IATA:</strong> {airport.iataCode}</p>
             <p><strong>ICAO:</strong> {airport.icaoCode}</p>
-            <p><strong>Runways:</strong> {airport.runwaysCount || 2} operational</p>
           </CardContent>
         </Card>
 
@@ -154,12 +153,11 @@ export function AirportDetails() {
               <Building className="h-4 w-4" />
               2. City Hub
             </div>
-            <CardTitle className="text-lg">{airport.city}</CardTitle>
+            <CardTitle className="text-lg">{airport.city?.name}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs space-y-1 text-slate-600 dark:text-slate-400">
-            <p><strong>Primary Metropolitan:</strong> {airport.city}</p>
-            <p><strong>Timezone:</strong> {airport.timezone}</p>
-            <p><strong>Regional Code:</strong> {airport.countryCode}</p>
+            <p><strong>Primary Metropolitan:</strong> {airport.city?.name}</p>
+
           </CardContent>
         </Card>
 
@@ -170,29 +168,17 @@ export function AirportDetails() {
               <Globe2 className="h-4 w-4" />
               3. Sovereign State
             </div>
-            <CardTitle className="text-lg">{airport.country}</CardTitle>
+            <CardTitle className="text-lg">{airport.city?.country?.name}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs space-y-1 text-slate-600 dark:text-slate-400">
-            <p><strong>Country Name:</strong> {airport.country}</p>
-            <p><strong>ISO 2-Letter Code:</strong> {airport.countryCode}</p>
+            <p><strong>Country Name:</strong> {airport.city?.country?.name}</p>
+            <p><strong>ISO 2-Letter Code:</strong> {airport.city?.country?.countryCodeTwo}</p>
             <p><strong>Aviation Authority:</strong> ICAO Member State</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Description & Overview */}
-      {airport.description && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold">About This Airport</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              {airport.description}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Interactive Leaflet Map Section */}
       <Card className="overflow-hidden border shadow-sm border-sky-100 bg-sky-50/30 dark:bg-sky-950/20">
@@ -212,9 +198,9 @@ export function AirportDetails() {
         <CardContent className="p-0">
           {hasCoords ? (
             <div className="h-[380px] w-full relative z-0">
+
               <MapContainer
-                center={[airport.latitude, airport.longitude]}
-                zoom={12}
+                center={[airport.latitudeDeg, airport.longitudeDeg]} zoom={12}
                 scrollWheelZoom={false}
                 style={{ height: '100%', width: '100%' }}
               >
@@ -223,17 +209,17 @@ export function AirportDetails() {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <Marker
-                  position={[airport.latitude, airport.longitude]}
+                  position={[airport.latitudeDeg, airport.longitudeDeg]}
                   icon={defaultMarkerIcon}
                 >
                   <Popup>
                     <div className="p-1 text-slate-900">
-                      <p className="font-bold text-sm">{airport.name}</p>
+                      <p className="font-bold text-sm">{airports.name}</p>
                       <p className="text-xs text-sky-600 font-mono font-bold">
                         IATA: {airport.iataCode} | ICAO: {airport.icaoCode}
                       </p>
                       <p className="text-xs text-slate-500 mt-1">
-                        {airport.city}, {airport.country}
+                        {airport.city?.name}, {airport.city?.country?.name}
                       </p>
                     </div>
                   </Popup>

@@ -7,9 +7,9 @@ import { Button } from '../ui/button';
 import { useNavigate } from 'react-router';
 
 export function AirportCard({ airport }) {
-const navigate =useNavigate()
-  function abc(){
-navigate(`/airports/${airport.iataCode}`)
+  const navigate = useNavigate()
+  function abc() {
+    navigate(`/airports/${airport.iataCode}`)
   }
   return (
     <Card className="group flex flex-col justify-between hover:border-sky-400 hover:shadow-md transition-all duration-200">
@@ -31,7 +31,7 @@ navigate(`/airports/${airport.iataCode}`)
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
           <span>
-            {airport.city}, {airport.country} ({airport.countryCode})
+            {airport.city?.name} {airport.city?.country?.name} ({airport.city?.country?.countryCodeTwo})
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -48,14 +48,14 @@ navigate(`/airports/${airport.iataCode}`)
 
       <CardFooter className="pt-3 border-t">
         {/* <Link to={`/airports/${airport.iataCode}`} className="w-full"> */}
-          <Button
-            variant="outline"
-            onClick ={abc}
-            className="w-full justify-between group-hover:bg-sky-50 group-hover:text-sky-700 group-hover:border-sky-300 dark:group-hover:bg-sky-950/50 cursor-pointer"
-          >
-            <span>View Airport Details</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
+        <Button
+          variant="outline"
+          onClick={abc}
+          className="w-full justify-between group-hover:bg-sky-50 group-hover:text-sky-700 group-hover:border-sky-300 dark:group-hover:bg-sky-950/50 cursor-pointer"
+        >
+          <span>View Airport Details</span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </Button>
         {/* </Link> */}
       </CardFooter>
     </Card>

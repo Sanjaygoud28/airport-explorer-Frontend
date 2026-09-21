@@ -5,10 +5,11 @@ import { airportApi } from '../services/airportApi';
  * Hook to query paginated & filtered airports list with TanStack Query.
  * Automatic caching, stale-while-revalidate, and pagination handling.
  */
-export function useAirports(params = {}) {
+export function useAirports(params = {}, enabled = true) {
   return useQuery({
-    queryKey: ['airports', params],
+    queryKey: ['airports'],
     queryFn: () => airportApi.getAirports(params),
+    enabled,
     placeholderData: (previousData) => previousData, // Smooth pagination transitions
   });
 }
