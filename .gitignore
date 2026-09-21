@@ -3,7 +3,7 @@ node_modules/
 
 # Environment variables
 .env
-.env.example
+# .env.example.git rm --cached .env.examplegit add .gitignore
 .env.local
 .env.development.local
 .env.test.local
