@@ -33,7 +33,8 @@ export function App() {
 
 
   return (
-    <QueryClientProvider client={queryClient}>  //providesreact query functionality
+    //providesreact query functionality imported from lib ->queryclient
+    <QueryClientProvider client={queryClient}>
 
       <Router>
         <div className="min-h-screen flex flex-col bg-background text-foreground">
